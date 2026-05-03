@@ -6,6 +6,7 @@
       <sourceFolder url="file://$MODULE_DIR$/authService/src/main/java" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/authService/src/main/resources" type="java-resource" />
       <sourceFolder url="file://$MODULE_DIR$/authService/src/test" isTestSource="true" />
+      <excludeFolder url="file://$MODULE_DIR$/authService/src/main/resources/wallet" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
