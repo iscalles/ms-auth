@@ -125,5 +125,7 @@
       </library>
     </orderEntry>
     <orderEntry type="library" name="Maven: com.oracle.database.jdbc:ojdbc11:23.9.0.25.07" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework.data:spring-data-jpa:4.0.5" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework.data:spring-data-commons:4.0.5" level="project" />
   </component>
 </module>
