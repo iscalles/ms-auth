@@ -10,7 +10,7 @@ public class CuentaAcceso {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "cuenta_acceso_seq")
-    @SequenceGenerator(name = "acceso_cuenta_seq", sequenceName = "seq_cuenta_acceso", allocationSize = 1)
+    @SequenceGenerator(name = "cuenta_acceso_seq", sequenceName = "seq_cuenta_acceso", allocationSize = 1)
     private Long id_cuenta;
 
     @Column(name = "RUT_USUARIO", nullable = false, length = 12)
