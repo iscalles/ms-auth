@@ -127,5 +127,24 @@
     <orderEntry type="library" name="Maven: com.oracle.database.jdbc:ojdbc11:23.9.0.25.07" level="project" />
     <orderEntry type="library" name="Maven: org.springframework.data:spring-data-jpa:4.0.5" level="project" />
     <orderEntry type="library" name="Maven: org.springframework.data:spring-data-commons:4.0.5" level="project" />
+    <orderEntry type="library" name="Maven: jakarta.validation:jakarta.validation-api:3.1.1" level="project" />
+    <orderEntry type="module-library" scope="PROVIDED">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/lombok-1.18.42.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library" scope="PROVIDED">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/lombok-1.18.42.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
   </component>
 </module>
