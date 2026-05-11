@@ -35,7 +35,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
         RefreshToken refreshTokenExistente = refreshTokenRepository.findById(id).orElse(null);
         if (refreshTokenExistente != null) {
             refreshTokenExistente.setToken(refreshToken.getToken());
-            refreshTokenExistente.setRutUsuario(refreshToken.getRutUsuario());
+            refreshTokenExistente.setIdUsuario(refreshToken.getIdUsuario());
             refreshTokenExistente.setFechaExpiracion(refreshToken.getFechaExpiracion());
             return refreshTokenRepository.save(refreshTokenExistente);
         } else {

@@ -15,8 +15,8 @@ public class RefreshToken {
     @Column(name = "TOKEN", nullable = false, length = 500)
     private String token;
 
-    @Column(name = "RUT_USUARIO", nullable = false, length = 12)
-    private String rutUsuario;
+    @Column(name = "RUT_USUARIO", nullable = false)
+    private Long idUsuario;
 
     @JsonFormat(pattern="dd-MM-yyyy HH:mm",timezone = "America/Santiago")
     @Column(name = "FECHA_EXPIRACION", nullable = false)
@@ -25,10 +25,10 @@ public class RefreshToken {
     public RefreshToken() {
     }
 
-    public RefreshToken(Long id_token, String token, String rutUsuario, LocalDateTime fechaExpiracion) {
+    public RefreshToken(Long id_token, String token, Long idUsuario, LocalDateTime fechaExpiracion) {
         this.id_token = id_token;
         this.token = token;
-        this.rutUsuario = rutUsuario;
+        this.idUsuario = idUsuario;
         this.fechaExpiracion = fechaExpiracion;
     }
 
@@ -40,12 +40,12 @@ public class RefreshToken {
         this.fechaExpiracion = fechaExpiracion;
     }
 
-    public String getRutUsuario() {
-        return rutUsuario;
+    public Long getIdUsuario() {
+        return idUsuario;
     }
 
-    public void setRutUsuario(String rutUsuario) {
-        this.rutUsuario = rutUsuario;
+    public void setIdUsuario(Long idUsuario) {
+        this.idUsuario = idUsuario;
     }
 
     public String getToken() {

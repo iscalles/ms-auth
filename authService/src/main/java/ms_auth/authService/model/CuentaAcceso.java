@@ -19,8 +19,8 @@ public class CuentaAcceso {
 
     @Setter
     @Getter
-    @Column(name = "RUT_USUARIO", nullable = false, length = 12, unique = true)
-    private String rutUsuario;
+    @Column(name = "ID_USUARIO", nullable = false, unique = true)
+    private Long idUsuario;
 
     @Setter
     @Getter
@@ -46,8 +46,8 @@ public class CuentaAcceso {
     // Constructores
     public CuentaAcceso() {}
 
-    public CuentaAcceso(String rutUsuario, String passwordHash, String estadoCuenta) {
-        this.rutUsuario = rutUsuario;
+    public CuentaAcceso(Long idUsuario, String passwordHash, String estadoCuenta) {
+        this.idUsuario = this.idUsuario;
         this.passwordHash = passwordHash;
         this.estadoCuenta = estadoCuenta;
     }

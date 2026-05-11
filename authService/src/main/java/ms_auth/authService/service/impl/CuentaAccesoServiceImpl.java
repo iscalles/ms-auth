@@ -34,7 +34,7 @@ public class CuentaAccesoServiceImpl implements CuentaAccesoService {
     public CuentaAcceso actualizarCuentaAcceso(CuentaAcceso cuentaAcceso, Long id) {
         CuentaAcceso cuentaAccesoExistente = cuentaAccesoRepository.findById(id).orElse(null);
         if (cuentaAccesoExistente != null) {
-            cuentaAccesoExistente.setRutUsuario(cuentaAcceso.getRutUsuario());
+            cuentaAccesoExistente.setIdUsuario(cuentaAcceso.getIdUsuario());
             cuentaAccesoExistente.setPasswordHash(cuentaAcceso.getPasswordHash());
             cuentaAccesoExistente.setTokenRecuperacion(cuentaAcceso.getTokenRecuperacion());
             cuentaAccesoExistente.setEstadoCuenta(cuentaAcceso.getEstadoCuenta());

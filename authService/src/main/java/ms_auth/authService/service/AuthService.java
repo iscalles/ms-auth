@@ -100,7 +100,7 @@ public class AuthService {
             throw new RuntimeException("Refresh token expirado");
         }
 
-        CuentaAcceso cuenta = cuentaRepository.findByRutUsuario(refreshToken.getRutUsuario())
+        CuentaAcceso cuenta = cuentaRepository.findByRutUsuario(refreshToken.getIdUsuario())
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
         String newAccessToken = jwtService.generarAccessToken(cuenta.getRutUsuario(), "USER");
@@ -108,7 +108,7 @@ public class AuthService {
 
         refreshTokenRepository.delete(refreshToken);
 
-        logger.info("Token refrescado para: {}", refreshToken.getRutUsuario());
+        logger.info("Token refrescado para: {}", refreshToken.getIdUsuario());
 
         return new LoginResponseDTO(
                 newAccessToken,
@@ -128,7 +128,7 @@ public class AuthService {
 
         RefreshToken refreshToken = new RefreshToken();
         refreshToken.setToken(token);
-        refreshToken.setRutUsuario(rutUsuario);
+        refreshToken.setIdUsuario(rutUsuario);
         refreshToken.setFechaExpiracion(LocalDateTime.now().plusDays(7));
 
         refreshTokenRepository.save(refreshToken);
