@@ -149,5 +149,8 @@
     <orderEntry type="library" name="Maven: io.jsonwebtoken:jjwt-api:0.12.3" level="project" />
     <orderEntry type="library" name="Maven: org.springframework.security:spring-security-crypto:7.0.5" level="project" />
     <orderEntry type="library" name="Maven: io.jsonwebtoken:jjwt-api:0.12.6" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework.cloud:spring-cloud-openfeign-core:4.0.3" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework.cloud:spring-cloud-openfeign-core:4.2.3" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework.cloud:spring-cloud-openfeign-core:4.1.0" level="project" />
   </component>
 </module>

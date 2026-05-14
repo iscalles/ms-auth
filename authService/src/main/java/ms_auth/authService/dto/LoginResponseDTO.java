@@ -1,22 +1,30 @@
 package ms_auth.authService.dto;
 
+import java.util.Set;
+
 public class LoginResponseDTO {
     private String accessToken;
     private String refreshToken;
-    private String rutUsuario;
-    private String tipoRol;
+    private Long idUsuario;
+    private String nombre;
+    private String correo;
+    private Set<String> roles;
     private Long expiresIn;
 
     public LoginResponseDTO() {}
 
-    public LoginResponseDTO(String accessToken, String refreshToken, String rutUsuario, String tipoRol, Long expiresIn) {
+    public LoginResponseDTO(String accessToken, String refreshToken, Long idUsuario,
+                            String nombre, String correo, Set<String> roles, Long expiresIn) {
         this.accessToken = accessToken;
         this.refreshToken = refreshToken;
-        this.rutUsuario = rutUsuario;
-        this.tipoRol = tipoRol;
+        this.idUsuario = idUsuario;
+        this.nombre = nombre;
+        this.correo = correo;
+        this.roles = roles;
         this.expiresIn = expiresIn;
     }
 
+    // Getters y Setters
     public String getAccessToken() {
         return accessToken;
     }
@@ -33,20 +41,36 @@ public class LoginResponseDTO {
         this.refreshToken = refreshToken;
     }
 
-    public String getRutUsuario() {
-        return rutUsuario;
+    public Long getIdUsuario() {
+        return idUsuario;
     }
 
-    public void setRutUsuario(String rutUsuario) {
-        this.rutUsuario = rutUsuario;
+    public void setIdUsuario(Long idUsuario) {
+        this.idUsuario = idUsuario;
     }
 
-    public String getTipoRol() {
-        return tipoRol;
+    public String getNombre() {
+        return nombre;
     }
 
-    public void setTipoRol(String tipoRol) {
-        this.tipoRol = tipoRol;
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
+    }
+
+    public String getCorreo() {
+        return correo;
+    }
+
+    public void setCorreo(String correo) {
+        this.correo = correo;
+    }
+
+    public Set<String> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(Set<String> roles) {
+        this.roles = roles;
     }
 
     public Long getExpiresIn() {

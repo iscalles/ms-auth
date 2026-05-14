@@ -11,6 +11,7 @@ import javax.crypto.SecretKey;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 @Service
 public class JwtService {
@@ -18,7 +19,7 @@ public class JwtService {
     @Value("${jwt.secret:misecretatuysuperaguantadadesdeprotegidodelmundoentero}")
     private String secret;
 
-    @Value("${jwt.expiration:3600000}")
+    @Value("${jwt.expiration:900000}")
     private long expiration;
 
     @Value("${jwt.refresh-expiration:604800000}")
@@ -28,15 +29,15 @@ public class JwtService {
         return Keys.hmacShaKeyFor(secret.getBytes());
     }
 
-    public String generarAccessToken(String rutUsuario, String tipoRol) {
+    public String generarAccessToken(Long idUsuario, Set<String> roles) {
         Map<String, Object> claims = new HashMap<>();
-        claims.put("tipoRol", tipoRol);
-        return crearToken(claims, rutUsuario, expiration);
+        claims.put("roles", roles);
+        return crearToken(claims, idUsuario.toString(), expiration);
     }
 
-    public String generarRefreshToken(String rutUsuario) {
+    public String generarRefreshToken(Long idUsuario) {
         Map<String, Object> claims = new HashMap<>();
-        return crearToken(claims, rutUsuario, refreshExpiration);
+        return crearToken(claims, idUsuario.toString(), refreshExpiration);
     }
 
     private String crearToken(Map<String, Object> claims, String subject, long expirationTime) {
@@ -64,13 +65,15 @@ public class JwtService {
         }
     }
 
-    public String extraerRut(String token) {
-        return extraerClaim(token, Claims::getSubject);
+    public Long extraerIdUsuario(String token) {
+        String idStr = extraerClaim(token, Claims::getSubject);
+        return Long.parseLong(idStr);
     }
 
-    public String extraerRol(String token) {
+    @SuppressWarnings("unchecked")
+    public Set<String> extraerRoles(String token) {
         Claims claims = extraerTodasLasClaims(token);
-        return (String) claims.get("tipoRol");
+        return (Set<String>) claims.get("roles");
     }
 
     private <T> T extraerClaim(String token, java.util.function.Function<Claims, T> claimsResolver) {

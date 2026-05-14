@@ -1,8 +1,10 @@
 package ms_auth.authService.service;
 
-import ms_auth.authService.dto.CrearCuentaRequestDTO;
+import ms_auth.authService.client.UsuarioClient;
+import ms_auth.authService.client.UsuarioDTOInternal;
 import ms_auth.authService.dto.LoginRequestDTO;
 import ms_auth.authService.dto.LoginResponseDTO;
+import ms_auth.authService.dto.RefreshTokenRequestDTO;
 import ms_auth.authService.model.CuentaAcceso;
 import ms_auth.authService.model.RefreshToken;
 import ms_auth.authService.repository.CuentaAccesoRepository;
@@ -15,7 +17,6 @@ import org.slf4j.LoggerFactory;
 import java.time.LocalDateTime;
 
 @Service
-@Transactional
 public class AuthService {
 
     private static final Logger logger = LoggerFactory.getLogger(AuthService.class);
@@ -24,97 +25,113 @@ public class AuthService {
     private final RefreshTokenRepository refreshTokenRepository;
     private final JwtService jwtService;
     private final PasswordService passwordService;
+    private final UsuarioClient usuarioClient;
 
     public AuthService(CuentaAccesoRepository cuentaRepository,
                        RefreshTokenRepository refreshTokenRepository,
                        JwtService jwtService,
-                       PasswordService passwordService) {
+                       PasswordService passwordService,
+                       UsuarioClient usuarioClient) {
         this.cuentaRepository = cuentaRepository;
         this.refreshTokenRepository = refreshTokenRepository;
         this.jwtService = jwtService;
         this.passwordService = passwordService;
+        this.usuarioClient = usuarioClient;
     }
 
     public LoginResponseDTO login(LoginRequestDTO request) {
-        CuentaAcceso cuenta = cuentaRepository.findByRutUsuario(request.getRutUsuario())
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+        //Consultar  MS_USUARIO para obtener idUsuario usando RUT
+        UsuarioDTOInternal usuarioInternal;
+        try {
+            usuarioInternal = usuarioClient.obtenerUsuarioPorRut(request.getRutUsuario());
+        } catch (Exception e) {
+            logger.error("Error consultando MS_USUARIO por RUT: {}", request.getRutUsuario(), e);
+            throw new RuntimeException("Usuario no encontrado");
+        }
 
+        // Buscar cuenta por ID_USUARIO en BD local
+        CuentaAcceso cuenta = cuentaRepository.findById(usuarioInternal.getIdUsuario())
+                .orElseThrow(() -> new RuntimeException("Cuenta de acceso no configurada"));
+
+        // Validar contraseña
         if (!passwordService.validarPassword(request.getPassword(), cuenta.getPasswordHash())) {
             throw new RuntimeException("Contraseña incorrecta");
         }
 
+        // Verificar estado de cuenta
         if (!cuenta.getEstadoCuenta().equals("ACTIVO")) {
             throw new RuntimeException("Cuenta desactivada");
         }
 
+        // Actualizar último acceso
         cuenta.setUltimoAcceso(LocalDateTime.now());
         cuentaRepository.save(cuenta);
 
-        String accessToken = jwtService.generarAccessToken(cuenta.getRutUsuario(), "USER");
-        String refreshToken = generarRefreshToken(cuenta.getRutUsuario());
-
-        logger.info("Login exitoso para: {}", request.getRutUsuario());
-
-        return new LoginResponseDTO(
-                accessToken,
-                refreshToken,
-                cuenta.getRutUsuario(),
-                "USER",
-                jwtService.obtenerTiempoExpiracion()
+        // Generar JWT con ID_USUARIO + ROLES
+        String accessToken = jwtService.generarAccessToken(
+                usuarioInternal.getIdUsuario(),
+                usuarioInternal.getRoles()
         );
-    }
 
-    public LoginResponseDTO crearCuenta(CrearCuentaRequestDTO request) {
-        if (cuentaRepository.findByRutUsuario(request.getRutUsuario()).isPresent()) {
-            throw new RuntimeException("RUT de usuario ya existe");
-        }
+        // Generar RefreshToken
+        String refreshToken = generarRefreshToken(usuarioInternal.getIdUsuario());
 
-        CuentaAcceso cuenta = new CuentaAcceso();
-        cuenta.setRutUsuario(request.getRutUsuario());
-        cuenta.setPasswordHash(passwordService.encriptarPassword(request.getPassword()));
-        cuenta.setEstadoCuenta("ACTIVO");
-        cuenta.setUltimoAcceso(LocalDateTime.now());
-
-        cuentaRepository.save(cuenta);
-
-        String accessToken = jwtService.generarAccessToken(cuenta.getRutUsuario(), "USER");
-        String refreshToken = generarRefreshToken(cuenta.getRutUsuario());
-
-        logger.info("Cuenta creada exitosamente para: {}", request.getRutUsuario());
+        logger.info("Login exitoso para usuario ID: {}", usuarioInternal.getIdUsuario());
 
         return new LoginResponseDTO(
                 accessToken,
                 refreshToken,
-                cuenta.getRutUsuario(),
-                "USER",
+                usuarioInternal.getIdUsuario(),
+                usuarioInternal.getNombre() + " " + usuarioInternal.getApellidos(),
+                usuarioInternal.getCorreo(),
+                usuarioInternal.getRoles(),
                 jwtService.obtenerTiempoExpiracion()
         );
     }
 
     public LoginResponseDTO refrescarToken(String refreshTokenStr) {
+        //Buscar RefreshToken en BD
         RefreshToken refreshToken = refreshTokenRepository.findByToken(refreshTokenStr)
                 .orElseThrow(() -> new RuntimeException("Refresh token no válido"));
 
+        //Validar expiración
         if (refreshToken.getFechaExpiracion().isBefore(LocalDateTime.now())) {
             refreshTokenRepository.delete(refreshToken);
             throw new RuntimeException("Refresh token expirado");
         }
 
-        CuentaAcceso cuenta = cuentaRepository.findByRutUsuario(refreshToken.getIdUsuario())
+        //Buscar cuenta por ID_USUARIO
+        CuentaAcceso cuenta = cuentaRepository.findById(refreshToken.getIdUsuario())
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
-        String newAccessToken = jwtService.generarAccessToken(cuenta.getRutUsuario(), "USER");
-        String newRefreshToken = generarRefreshToken(cuenta.getRutUsuario());
+        //Consultar MS_USUARIO para obtener roles actualizados
+        UsuarioDTOInternal usuarioInternal;
+        try {
+            usuarioInternal = usuarioClient.obtenerUsuarioInterno(cuenta.getIdUsuario());
+        } catch (Exception e) {
+            logger.error("Error consultando MS_USUARIO en refresh", e);
+            throw new RuntimeException("Error consultando servicio de usuario");
+        }
 
+        //Generar nuevo AccessToken
+        String newAccessToken = jwtService.generarAccessToken(
+                cuenta.getIdUsuario(),
+                usuarioInternal.getRoles()
+        );
+
+        //Generar nuevo RefreshToken
         refreshTokenRepository.delete(refreshToken);
+        String newRefreshToken = generarRefreshToken(cuenta.getIdUsuario());
 
-        logger.info("Token refrescado para: {}", refreshToken.getIdUsuario());
+        logger.info("Token refrescado para usuario ID: {}", cuenta.getIdUsuario());
 
         return new LoginResponseDTO(
                 newAccessToken,
                 newRefreshToken,
-                cuenta.getRutUsuario(),
-                "USER",
+                cuenta.getIdUsuario(),
+                usuarioInternal.getNombre() + " " + usuarioInternal.getApellidos(),
+                usuarioInternal.getCorreo(),
+                usuarioInternal.getRoles(),
                 jwtService.obtenerTiempoExpiracion()
         );
     }
@@ -123,12 +140,25 @@ public class AuthService {
         return jwtService.validarToken(token);
     }
 
-    private String generarRefreshToken(String rutUsuario) {
-        String token = jwtService.generarRefreshToken(rutUsuario);
+    public void logout(String token) {
+        if (!jwtService.validarToken(token)) {
+            throw new RuntimeException("Token inválido");
+        }
+
+        Long idUsuario = jwtService.extraerIdUsuario(token);
+
+        // Eliminar todos los RefreshTokens del usuario
+        refreshTokenRepository.deleteByIdUsuario(idUsuario);
+
+        logger.info("Logout exitoso para usuario ID: {}", idUsuario);
+    }
+
+    private String generarRefreshToken(Long idUsuario) {
+        String token = jwtService.generarRefreshToken(idUsuario);
 
         RefreshToken refreshToken = new RefreshToken();
         refreshToken.setToken(token);
-        refreshToken.setIdUsuario(rutUsuario);
+        refreshToken.setIdUsuario(idUsuario);
         refreshToken.setFechaExpiracion(LocalDateTime.now().plusDays(7));
 
         refreshTokenRepository.save(refreshToken);
