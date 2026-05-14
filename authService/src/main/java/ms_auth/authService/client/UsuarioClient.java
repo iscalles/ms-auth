@@ -11,8 +11,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 public interface UsuarioClient {
 
     /*Obtiene usuario interno por RUT*/
-    @GetMapping("/usuario/interno/rut/{rutUsuario}")
-    UsuarioDTOInternal obtenerUsuarioPorRut(@PathVariable("rutUsuario") String rutUsuario);
+    @GetMapping("/usuario/interno/rut/{rut}")
+    UsuarioDTOInternal obtenerUsuarioPorRut(@PathVariable("rut") String rutUsuario);
 
     /*Obtiene datos del usuario por ID*/
     @GetMapping("/usuario/interno/{idUsuario}")

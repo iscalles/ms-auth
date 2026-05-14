@@ -44,14 +44,20 @@ public class AuthService {
         UsuarioDTOInternal usuarioInternal;
         try {
             usuarioInternal = usuarioClient.obtenerUsuarioPorRut(request.getRutUsuario());
+            logger.info("Usuario obtenido de ms-usuario: {}", usuarioInternal.getIdUsuario());
         } catch (Exception e) {
-            logger.error("Error consultando MS_USUARIO por RUT: {}", request.getRutUsuario(), e);
+            logger.error("Error en Feign - Error completo: ", e); // Ver stack trace completo
             throw new RuntimeException("Usuario no encontrado");
         }
 
         // Buscar cuenta por ID_USUARIO en BD local
-        CuentaAcceso cuenta = cuentaRepository.findById(usuarioInternal.getIdUsuario())
-                .orElseThrow(() -> new RuntimeException("Cuenta de acceso no configurada"));
+        logger.info("Buscando CuentaAcceso con ID_USUARIO: {}", usuarioInternal.getIdUsuario());
+        CuentaAcceso cuenta = cuentaRepository.findByIdUsuario(usuarioInternal.getIdUsuario())
+                .orElseThrow(() -> {
+                    logger.error("NO ENCONTRADO: No existe CuentaAcceso para ID_USUARIO: {}", usuarioInternal.getIdUsuario());
+                    return new RuntimeException("Cuenta de acceso no configurada");
+                });
+        logger.info("CuentaAcceso encontrada: ID_CUENTA={}", cuenta.getIdCuenta());
 
         // Validar contraseña
         if (!passwordService.validarPassword(request.getPassword(), cuenta.getPasswordHash())) {
