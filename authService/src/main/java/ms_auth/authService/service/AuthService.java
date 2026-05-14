@@ -46,12 +46,11 @@ public class AuthService {
             usuarioInternal = usuarioClient.obtenerUsuarioPorRut(request.getRutUsuario());
             logger.info("Usuario obtenido de ms-usuario: {}", usuarioInternal.getIdUsuario());
         } catch (Exception e) {
-            logger.error("Error en Feign - Error completo: ", e); // Ver stack trace completo
+            logger.error("Error en Feign - Error completo: ", e);
             throw new RuntimeException("Usuario no encontrado");
         }
 
         // Buscar cuenta por ID_USUARIO en BD local
-        logger.info("Buscando CuentaAcceso con ID_USUARIO: {}", usuarioInternal.getIdUsuario());
         CuentaAcceso cuenta = cuentaRepository.findByIdUsuario(usuarioInternal.getIdUsuario())
                 .orElseThrow(() -> {
                     logger.error("NO ENCONTRADO: No existe CuentaAcceso para ID_USUARIO: {}", usuarioInternal.getIdUsuario());
