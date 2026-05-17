@@ -2,14 +2,13 @@ package ms_auth.authService;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-
-import static org.springframework.boot.SpringApplication.run;
+import org.springframework.cloud.openfeign.EnableFeignClients;
 
 @SpringBootApplication
+@EnableFeignClients
 public class AuthServiceApplication {
 
 	public static void main(String[] args) {
-		run(AuthServiceApplication.class, args);
+		SpringApplication.run(AuthServiceApplication.class, args);
 	}
-
 }
