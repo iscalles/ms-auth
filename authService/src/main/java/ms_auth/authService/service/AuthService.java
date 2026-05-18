@@ -145,6 +145,7 @@ public class AuthService {
         return jwtService.validarToken(token);
     }
 
+    @Transactional
     public void logout(String token) {
         if (!jwtService.validarToken(token)) {
             throw new RuntimeException("Token inválido");
