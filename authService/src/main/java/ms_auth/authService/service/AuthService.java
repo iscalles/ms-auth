@@ -105,8 +105,8 @@ public class AuthService {
             throw new RuntimeException("Refresh token expirado");
         }
 
-        //Buscar cuenta por ID_USUARIO
-        CuentaAcceso cuenta = cuentaRepository.findById(refreshToken.getIdUsuario())
+        //Buscar cuenta por ID_USUARIO (findById busca por ID_CUENTA, que es una clave distinta)
+        CuentaAcceso cuenta = cuentaRepository.findByIdUsuario(refreshToken.getIdUsuario())
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
         //Consultar MS_USUARIO para obtener roles actualizados
