@@ -13,6 +13,7 @@ Microservicio responsable de la **autenticación y gestión de sesiones** del si
 - Revocar refresh tokens al cerrar sesión
 - Gestionar cuentas de acceso (`CUENTA_ACCESO`)
 - Hashear contraseñas con **BCrypt**
+- Recuperación de contraseña por correo: genera una contraseña temporal y la envía por email (Mailtrap) sin revelar si el correo existe en el sistema
 
 ---
 
@@ -71,6 +72,13 @@ spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.OracleDialect
 
 # URL del microservicio de usuarios
 ms-usuario.url=http://localhost:8081
+
+# Email (Mailtrap) — usado por /auth/recuperar-password
+spring.mail.host=sandbox.smtp.mailtrap.io
+spring.mail.port=2525
+spring.mail.username=<credenciales-mailtrap>
+spring.mail.password=<credenciales-mailtrap>
+mail.remitente=no-responder@colegio-bernardo-ohiggins.cl
 ```
 
 ---
@@ -83,7 +91,13 @@ ms-usuario.url=http://localhost:8081
 | POST | `/auth/refresh` | Público | Renovar access token con refresh token |
 | POST | `/auth/logout` | JWT requerido | Revocar sesión y eliminar refresh tokens |
 | GET | `/auth/validate` | JWT requerido | Validar si el token actual es válido |
+| POST | `/auth/recuperar-password` | Público | Genera una contraseña temporal y la envía por correo (Mailtrap). Siempre responde 200, no revela si el correo existe |
 | GET | `/cuenta-acceso` | JWT requerido | Listar todas las cuentas |
+| GET | `/cuenta-acceso/{id}` | JWT requerido | Buscar cuenta por `idCuenta` |
+| POST | `/cuenta-acceso` | JWT requerido | Crear cuenta (CRUD directo, espera `passwordHash` ya hasheado) |
+| PUT | `/cuenta-acceso/{id}` | JWT requerido | Actualizar cuenta |
+| DELETE | `/cuenta-acceso/{id}` | JWT requerido | Eliminar cuenta (hard delete) |
+| PUT | `/cuenta-acceso/usuario/{idUsuario}/desactivar` | JWT requerido | Desactivar cuenta por `idUsuario` (soft delete, usado al eliminar un usuario en ms-usuario) |
 | POST | `/cuenta-acceso/inicializar` | JWT requerido | Crear cuenta con contraseña en texto plano (hashea internamente) |
 | POST | `/cuenta-acceso/cambiar-contrasena` | JWT requerido | Cambiar contraseña validando la actual |
 

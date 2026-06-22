@@ -28,6 +28,10 @@ public class CuentaAcceso {
     @Column(name = "ULTIMO_ACCESO")
     private LocalDateTime ultimoAcceso;
 
+    // Obliga a definir una contraseña propia en el primer login (true al crear la cuenta)
+    @Column(name = "DEBE_CAMBIAR_PASSWORD", nullable = false)
+    private boolean debeCambiarPassword;
+
     // Constructores
     public CuentaAcceso() {}
 
@@ -84,5 +88,13 @@ public class CuentaAcceso {
 
     public void setUltimoAcceso(LocalDateTime ultimoAcceso) {
         this.ultimoAcceso = ultimoAcceso;
+    }
+
+    public boolean isDebeCambiarPassword() {
+        return debeCambiarPassword;
+    }
+
+    public void setDebeCambiarPassword(boolean debeCambiarPassword) {
+        this.debeCambiarPassword = debeCambiarPassword;
     }
 }
