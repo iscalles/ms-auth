@@ -10,6 +10,7 @@ public class LoginResponseDTO {
     private String correo;
     private Set<String> roles;
     private Long expiresIn;
+    private boolean debeCambiarPassword;
 
     public LoginResponseDTO() {}
 
@@ -79,5 +80,13 @@ public class LoginResponseDTO {
 
     public void setExpiresIn(Long expiresIn) {
         this.expiresIn = expiresIn;
+    }
+
+    public boolean isDebeCambiarPassword() {
+        return debeCambiarPassword;
+    }
+
+    public void setDebeCambiarPassword(boolean debeCambiarPassword) {
+        this.debeCambiarPassword = debeCambiarPassword;
     }
 }

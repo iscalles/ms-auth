@@ -39,6 +39,7 @@ public class AuthService {
         this.usuarioClient = usuarioClient;
     }
 
+    @Transactional
     public LoginResponseDTO login(LoginRequestDTO request) {
         //Consultar  MS_USUARIO para obtener idUsuario usando RUT
         UsuarioDTOInternal usuarioInternal;
@@ -78,12 +79,14 @@ public class AuthService {
                 usuarioInternal.getRoles()
         );
 
-        // Generar RefreshToken
+        // Invalida cualquier refresh token previo de este usuario para que solo exista
+        // un registro vigente por usuario en vez de ir acumulando uno por cada login.
+        refreshTokenRepository.deleteByIdUsuario(usuarioInternal.getIdUsuario());
         String refreshToken = generarRefreshToken(usuarioInternal.getIdUsuario());
 
         logger.info("Login exitoso para usuario ID: {}", usuarioInternal.getIdUsuario());
 
-        return new LoginResponseDTO(
+        LoginResponseDTO respuesta = new LoginResponseDTO(
                 accessToken,
                 refreshToken,
                 usuarioInternal.getIdUsuario(),
@@ -92,8 +95,11 @@ public class AuthService {
                 usuarioInternal.getRoles(),
                 jwtService.obtenerTiempoExpiracion()
         );
+        respuesta.setDebeCambiarPassword(cuenta.isDebeCambiarPassword());
+        return respuesta;
     }
 
+    @Transactional
     public LoginResponseDTO refrescarToken(String refreshTokenStr) {
         //Buscar RefreshToken en BD
         RefreshToken refreshToken = refreshTokenRepository.findByToken(refreshTokenStr)
