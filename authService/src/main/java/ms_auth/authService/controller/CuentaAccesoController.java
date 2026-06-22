@@ -45,6 +45,12 @@ public class CuentaAccesoController {
         service.eliminarCuentaAcceso(id);
     }
 
+    // Llamado por ms-usuario al eliminar un usuario: desactiva la cuenta en vez de borrarla.
+    @PutMapping("/usuario/{idUsuario}/desactivar")
+    public void desactivarCuentaPorUsuario(@PathVariable Long idUsuario) {
+        service.desactivarCuentaPorUsuario(idUsuario);
+    }
+
     // Recibe contraseña en texto plano, la hashea con BCrypt y crea la cuenta
     @PostMapping("/inicializar")
     public ResponseEntity<CuentaAcceso> inicializarCuenta(@Valid @RequestBody InicializarCuentaDTO dto) {

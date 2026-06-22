@@ -17,4 +17,8 @@ public interface UsuarioClient {
     /*Obtiene datos del usuario por ID*/
     @GetMapping("/usuario/interno/{idUsuario}")
     UsuarioDTOInternal obtenerUsuarioInterno(@PathVariable("idUsuario") Long idUsuario);
+
+    /*Obtiene usuario interno por correo (para recuperación de contraseña)*/
+    @GetMapping("/usuario/interno/correo/{correo}")
+    UsuarioDTOInternal obtenerUsuarioPorCorreo(@PathVariable("correo") String correo);
 }
